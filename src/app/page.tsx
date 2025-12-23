@@ -50,7 +50,7 @@ export default function Home() {
                         <span className="text-[9px] font-black tracking-[0.3em] uppercase text-gray-400">Ritual IA de Calma</span>
                     </motion.div>
 
-                    <h1 className="text-[5.5rem] font-light tracking-tighter mb-4 leading-none">
+                    <h1 className="text-6xl md:text-[5.5rem] font-light tracking-tighter mb-4 leading-none transition-all">
                         calm<span className="text-accent font-medium">ly</span>
                     </h1>
                     <p className="text-lg text-gray-500 font-light leading-relaxed max-w-[280px] mx-auto">
