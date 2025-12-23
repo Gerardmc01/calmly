@@ -1,21 +1,33 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { ChevronLeft, Crown, Award, Clock, Calendar, ShieldCheck, Heart, Sparkles, CheckCircle2 } from 'lucide-react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, Crown, Award, Clock, Calendar, ShieldCheck, Heart, Sparkles, CheckCircle2, Edit2, Check } from 'lucide-react'
 import Link from 'next/link'
 import { useApp } from '@/context/AppContext'
 
 export default function ProfilePage() {
     const {
         isPremium, setIsPremium, streak, minutesTotal, sessions,
-        xp, level, levelProgress, challenges
+        xp, level, levelProgress, challenges, username, setUsername
     } = useApp()
+
+    const [isEditing, setIsEditing] = useState(false)
+    const [editName, setEditName] = useState(username)
+
+    const handleSave = () => {
+        setUsername(editName)
+        setIsEditing(false)
+    }
 
     const stats = [
         { label: 'Racha actual', value: `${streak} días`, icon: <Calendar size={16} /> },
         { label: 'Minutos total', value: `${Math.round(minutesTotal)} min`, icon: <Clock size={16} /> },
         { label: 'Sesiones', value: sessions.length.toString(), icon: <Award size={16} /> },
     ]
+
+    // Calculate level stats locally to show details (or we could expose them from context)
+    // For now simple display is fine, context handles levels
 
     return (
         <main className="min-h-screen bg-black text-white p-8 flex flex-col select-none">
@@ -38,13 +50,35 @@ export default function ProfilePage() {
                         className="absolute inset-x-[-12px] inset-y-[-12px] border border-dashed border-accent/20 rounded-full"
                     />
                     <div className="w-24 h-24 rounded-full bg-accent/5 border border-accent/20 flex items-center justify-center text-accent text-3xl font-light overflow-hidden">
-                        GC
+                        {username.substring(0, 2).toUpperCase()}
                     </div>
                 </div>
-                <h2 className="text-3xl font-light tracking-tight">Gerardo C.</h2>
-                <div className="flex items-center gap-3 mt-4">
+
+                <div className="flex items-center gap-3 mb-2">
+                    {isEditing ? (
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="text"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                className="bg-transparent border-b border-accent text-3xl font-light tracking-tight text-center w-48 focus:outline-none"
+                                autoFocus
+                            />
+                            <button onClick={handleSave} className="w-8 h-8 flex items-center justify-center bg-accent/20 rounded-full text-accent">
+                                <Check size={16} />
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2" onClick={() => { setIsEditing(true); setEditName(username); }}>
+                            <h2 className="text-3xl font-light tracking-tight">{username}</h2>
+                            <Edit2 size={14} className="text-gray-700 hover:text-white cursor-pointer" />
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-3 mt-2">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-soft px-3 py-1 bg-accent/5 rounded-lg border border-accent/10">
-                        Nivel • {level}
+                        {level}
                     </span>
                     <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-lg ${isPremium ? 'bg-accent/20 text-accent border border-accent/30' : 'bg-white/5 text-gray-500'}`}>
                         {isPremium ? 'Premium' : 'Free User'}
@@ -60,7 +94,7 @@ export default function ProfilePage() {
                         className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent/50 to-accent rounded-full"
                     />
                 </div>
-                <div className="flex justify-between w-full max-w-[280px] mt-2 opacity-30">
+                <div className="flex justify-between w-full max-w-[280px] mt-2 opacity-50">
                     <span className="text-[8px] font-black uppercase tracking-wider">{xp} XP</span>
                     <span className="text-[8px] font-black uppercase tracking-wider">Próximo Nivel</span>
                 </div>
@@ -159,8 +193,8 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            <div className="mt-auto py-8 text-center">
-                <button className="text-[10px] text-gray-800 font-black uppercase tracking-[0.4em] hover:text-white transition-colors">Cerrar sesión</button>
+            <div className="mt-auto py-8 text-center text-gray-800">
+                <p className="text-[10px] font-black uppercase tracking-[0.4em]">Calmly ID: {Math.random().toString(36).substring(7).toUpperCase()}</p>
             </div>
         </main>
     )
