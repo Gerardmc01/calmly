@@ -15,7 +15,7 @@ declare global {
 }
 
 export default function PlayerPage() {
-    const { addSession, level, xp } = useApp()
+    const { addSession, level, xp, addXP } = useApp()
     const [mode, setMode] = useState<RitualMode>('Relajar')
     const [playlist, setPlaylist] = useState<RitualTrack[]>([])
     const [isScreenOff, setIsScreenOff] = useState(false)
@@ -80,17 +80,12 @@ export default function PlayerPage() {
                 }
             });
         } else if (apiReady && playlist.length > 0 && playerRef.current && isPlaying) {
-            // If we changed mode, playlist changed. If we are supposed to be playing, load the new first track?
-            // Actually, better to wait for user to hit play unless it was already playing?
-            // Let's just load the first track of the shuffle but NOT auto-play to avoid jarring transitions
-            // UNLESS the user was already jamming. But mode change stops playback usually.
-            // We'll let user press play.
             playerRef.current.loadVideoById(playlist[0].id)
             playerRef.current.stopVideo()
             setIsPlaying(false)
             setTimeLeft(initialTime)
         }
-    }, [apiReady, playlist]) // Be careful with this dependency 
+    }, [apiReady, playlist])
 
     const resetControlsTimeout = () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
@@ -124,7 +119,6 @@ export default function PlayerPage() {
 
     const loadRitual = (idx: number) => {
         if (!playerRef.current || !apiReady || !playlist[idx]) return
-
         const track = playlist[idx];
         playerRef.current.loadVideoById(track.id)
         playerRef.current.playVideo()
@@ -138,6 +132,22 @@ export default function PlayerPage() {
         loadRitual(trackIndex)
         resetControlsTimeout()
     }
+
+    // Passive XP Gain (Every 30 seconds of play)
+    useEffect(() => {
+        let xpInterval: NodeJS.Timeout | null = null;
+
+        if (isPlaying && !isFinished) {
+            xpInterval = setInterval(() => {
+                addXP(10) // 10 XP every 30s
+            }, 30000)
+        }
+
+        return () => {
+            if (xpInterval) clearInterval(xpInterval)
+        }
+    }, [isPlaying, isFinished, addXP])
+
 
     const toggleRitual = () => {
         if (!playerRef.current || !apiReady) return

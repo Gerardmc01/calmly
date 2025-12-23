@@ -51,20 +51,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         { id: '3', text: 'Completa tu primer ritual', completed: false, xpReward: 100 },
     ])
 
-    // Enhanced Level Calculation Logic
+    // Fast & Addictive Leveling System (v4)
     const getLevelInfo = (xpVal: number) => {
         const levels = [
-            { threshold: 0, title: 'Iniciado' },
-            { threshold: 200, title: 'Buscador' },
-            { threshold: 500, title: 'Aprendiz Zen' },
-            { threshold: 1000, title: 'Viajero Astral' },
-            { threshold: 2000, title: 'Caminante del Silencio' },
-            { threshold: 3500, title: 'Guardián del Sueño' },
-            { threshold: 5500, title: 'Arquitecto de Paz' },
-            { threshold: 8000, title: 'Maestro de la Bruma' },
-            { threshold: 12000, title: 'Sabio Eterno' },
-            { threshold: 20000, title: 'Oráculo de Luz' },
-            { threshold: 50000, title: 'Dios del Descanso' }
+            { threshold: 0, title: 'Soul' },
+            { threshold: 100, title: 'Spark' },     // ~5-10 mins
+            { threshold: 300, title: 'Drift' },     // ~30 mins
+            { threshold: 600, title: 'Flow' },      // ~1 hour
+            { threshold: 1000, title: 'Vibe' },
+            { threshold: 1500, title: 'Flux' },
+            { threshold: 2200, title: 'Mist' },
+            { threshold: 3000, title: 'Echo' },
+            { threshold: 4000, title: 'Zen' },
+            { threshold: 5500, title: 'Aura' },
+            { threshold: 7500, title: 'Void' },
+            { threshold: 10000, title: 'Nova' },    // Elite
+            { threshold: 15000, title: 'Nexus' },
+            { threshold: 25000, title: 'Apex' },
+            { threshold: 50000, title: 'God' },
+            { threshold: 100000, title: 'Eternal' }
         ]
 
         let currentLevel = levels[0]
@@ -73,7 +78,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         for (let i = 0; i < levels.length - 1; i++) {
             if (xpVal >= levels[i].threshold) {
                 currentLevel = levels[i]
-                nextLevel = levels[i + 1] || { threshold: 1000000, title: 'Trascendencia' }
+                nextLevel = levels[i + 1] || { threshold: 1000000, title: 'Infinite' }
             }
         }
 
@@ -168,9 +173,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
         setSessions((prev: Session[]) => [newSession, ...prev])
 
-        // Auto XP for session: ~10 XP per minute + 20 flat
-        const earnedXP = Math.round(sessionData.duration / 6) + 20
-        addXP(earnedXP)
+        // Completion Bonus ONLY (Passive XP handles the rest)
+        // Bonus = ~10% of duration + 50 flat
+        const bonusXP = Math.round(sessionData.duration / 10) + 50
+        addXP(bonusXP)
 
         // Check for specific mode challenges
         if (sessionData.mode === 'Dormir') {
