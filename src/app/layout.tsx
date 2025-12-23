@@ -1,5 +1,7 @@
+import React from 'react'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { AppProvider } from '@/context/AppContext'
 
 export const metadata: Metadata = {
   title: 'Calmly | Tu Ritual de Relajación ASMR',
@@ -27,7 +29,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <AppProvider>
+          {children}
+        </AppProvider>
+      </body>
     </html>
   )
 }

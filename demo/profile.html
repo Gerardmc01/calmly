@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calmly Mi Perfil</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@200;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-primary: #f5f5f5;
+            --text-secondary: #888888;
+            --accent: #c5a059;
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            text-decoration: none;
+        }
+
+        nav h1 {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: #555;
+            margin: 0;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px auto;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(197, 160, 89, 0.1);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 200;
+            color: var(--accent);
+        }
+
+        .avatar-ring {
+            position: absolute;
+            inset: -8px;
+            border: 1px dashed rgba(197, 160, 89, 0.2);
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .name {
+            font-size: 1.75rem;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #666;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            border-radius: 99px;
+        }
+
+        .badge.premium {
+            background: var(--accent);
+            color: black;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-cols: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-icon {
+            color: var(--accent);
+            background: rgba(197, 160, 89, 0.1);
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px auto;
+        }
+
+        .stat-val {
+            font-size: 14px;
+            font-weight: 800;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #444;
+            margin-top: 4px;
+        }
+
+        /* Premium Card */
+        .premium-card {
+            position: relative;
+            margin: 0 24px;
+            padding: 32px;
+            background: linear-gradient(135deg, #1a1a1a, #000);
+            border: 1px solid rgba(197, 160, 89, 0.2);
+            border-radius: 32px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .premium-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(197, 160, 89, 0.15), transparent 70%);
+            filter: blur(30px);
+        }
+
+        .promo-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(197, 160, 89, 0.1);
+            color: var(--accent);
+            border-radius: 99px;
+            margin-bottom: 24px;
+        }
+
+        .promo-pill span {
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .premium-card h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 0 0 12px 0;
+        }
+
+        .premium-card p {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin: 0 auto 32px auto;
+            max-width: 240px;
+        }
+
+        .premium-btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background: var(--accent);
+            color: black;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 14px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            box-shadow: 0 10px 20px rgba(197, 160, 89, 0.1);
+        }
+
+        /* Settings */
+        .settings {
+            margin-top: 48px;
+            padding: 0 24px 40px 24px;
+        }
+
+        .settings-title {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: #333;
+            margin-left: 16px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 24px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #888;
+        }
+
+        .item-left span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="player.html" class="nav-btn">
+            <i data-lucide="chevron-left"></i>
+        </a>
+        <h1>Mi Perfil</h1>
+        <div style="width: 40px;"></div>
+    </nav>
+
+    <div class="profile-header">
+        <div class="avatar-container">
+            <div class="avatar-ring"></div>
+            <div class="avatar">GC</div>
+        </div>
+        <h2 class="name">Gerardo C.</h2>
+        <div class="badge" id="uBadge">Usuario Free</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i data-lucide="calendar" size="14"></i></div>
+            <span class="stat-val">5 días</span>
+            <span class="stat-label">Racha</span>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i data-lucide="clock" size="14"></i></div>
+            <span class="stat-val">120 min</span>
+            <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i data-lucide="award" size="14"></i></div>
+            <span class="stat-val">12</span>
+            <span class="stat-label">Sesiones</span>
+        </div>
+    </div>
+
+    <div class="premium-card" id="pCard">
+        <div class="promo-pill">
+            <i data-lucide="crown" size="10"></i>
+            <span>Oferta Especial</span>
+        </div>
+        <h3>Desbloquea calma ilimitada</h3>
+        <p>Loops IA premium, sesiones de más de 10 min y experiencia sin anuncios.</p>
+        <a href="#" class="premium-btn" onclick="upgrade()">Pasar a Premium • 3,99€</a>
+    </div>
+
+    <div class="settings">
+        <span class="settings-title">Preferencias</span>
+        <div class="settings-item">
+            <div class="item-left">
+                <i data-lucide="heart" size="18"></i>
+                <span>Favoritos</span>
+            </div>
+            <i data-lucide="chevron-right" size="16" style="color: #222;"></i>
+        </div>
+        <div class="settings-item">
+            <div class="item-left">
+                <i data-lucide="shield-check" size="18"></i>
+                <span>Privacidad</span>
+            </div>
+            <i data-lucide="chevron-right" size="16" style="color: #222;"></i>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: auto; padding: 40px;">
+        <span
+            style="font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; color: #333; cursor: pointer;">Cerrar
+            Sesión</span>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function upgrade() {
+            document.getElementById('pCard').style.display = 'none';
+            const badge = document.getElementById('uBadge');
+            badge.innerText = 'Premium';
+            badge.classList.add('premium');
+            alert('¡Bienvenido a Calmly Premium!');
+        }
+    </script>
+</body>
+
+</html>

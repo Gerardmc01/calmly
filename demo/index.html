@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calmly | Ritual de Relajación IA</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;800&family=Outfit:wght@100;300;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --accent: #d4af37;
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ambient {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 50%, #0c0c0c 0%, #000 100%);
+        }
+
+        .glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vw;
+            height: 80vw;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            filter: blur(60px);
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .premium-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 100px;
+            margin-bottom: 40px;
+        }
+
+        .premium-tag span {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--accent);
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 4.5rem;
+            font-weight: 100;
+            letter-spacing: -0.06em;
+            margin-bottom: 12px;
+        }
+
+        .logo b {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .subtext {
+            font-size: 1.1rem;
+            color: #777;
+            font-weight: 300;
+            line-height: 1.6;
+            margin-bottom: 60px;
+        }
+
+        .subtext span {
+            color: white;
+            font-weight: 400;
+        }
+
+        /* Final Robust Button Design */
+        .btn-box {
+            display: block;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+            height: 70px;
+            background: #ffffff;
+            color: #000000;
+            border-radius: 35px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .btn-box:active {
+            transform: scale(0.96);
+            background: #eee;
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 48px;
+            opacity: 0.25;
+        }
+
+        .f-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .f-item span {
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .footer-branding {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            text-align: center;
+            opacity: 0.1;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ambient">
+        <div class="glow"></div>
+    </div>
+
+    <div class="container">
+        <div class="premium-tag">
+            <i data-lucide="sparkles" size="12" style="color: var(--accent)"></i>
+            <span>Ritual Premium IA</span>
+        </div>
+
+        <h1 class="logo">calm<b>ly</b></h1>
+
+        <p class="subtext">
+            ¿Te relajó este loop?<br>
+            <span>Úsalo para dormir esta noche.</span>
+        </p>
+
+        <a href="player.html" class="btn-box">
+            Entrar en Calma
+        </a>
+
+        <div class="features">
+            <div class="f-item">
+                <i data-lucide="volume-2" size="18"></i>
+                <span>ASMR 8D</span>
+            </div>
+            <div class="f-item">
+                <i data-lucide="moon" size="18"></i>
+                <span>Sleep</span>
+            </div>
+            <div class="f-item">
+                <i data-lucide="shield-check" size="18"></i>
+                <span>Privado</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-branding">
+        Tranquility Engine v1.0
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

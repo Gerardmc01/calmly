@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Ritual | Calmly Profile</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@100;300;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-primary: #ffffff;
+            --text-secondary: #666666;
+            --accent: #d4af37;
+            --accent-soft: rgba(212, 175, 55, 0.1);
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .back-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            color: #555;
+            text-decoration: none;
+        }
+
+        .nav-title {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            color: #333;
+        }
+
+        /* Profile Header */
+        .header {
+            padding: 60px 32px 40px 32px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .avatar-wrap {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--accent-soft);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 100;
+            color: var(--accent);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 1);
+        }
+
+        .level-badge {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: black;
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            white-space: nowrap;
+        }
+
+        .name {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-top: 20px;
+            color: white;
+        }
+
+        .xp-bar-container {
+            width: 100%;
+            max-width: 260px;
+            background: rgba(255, 255, 255, 0.04);
+            height: 4px;
+            border-radius: 10px;
+            margin-top: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .xp-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            box-shadow: 0 0 15px var(--accent);
+            transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .xp-info {
+            width: 100%;
+            max-width: 260px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 14px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #333;
+        }
+
+        /* Stats Stack (Matching Reference Image) */
+        .stats {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 0;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            padding: 80px 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            background: none;
+        }
+
+        .stat-card:first-child {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .stat-val {
+            font-size: 5rem;
+            font-weight: 300;
+            color: white;
+            display: block;
+            margin-bottom: 20px;
+            font-family: var(--font-display);
+            letter-spacing: -0.05em;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #333;
+            letter-spacing: 0.5em;
+        }
+
+        /* Challenges */
+        .section-title {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.4em;
+            color: #222;
+            margin: 0 32px 24px 32px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .challenge-card {
+            margin: 0 24px 14px 24px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 36px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .challenge-card.done {
+            background: rgba(212, 175, 55, 0.05);
+            border-color: rgba(212, 175, 55, 0.1);
+            opacity: 0.7;
+        }
+
+        .c-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+        }
+
+        .done .c-icon {
+            color: var(--accent);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .c-body {
+            flex: 1;
+        }
+
+        .c-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .done .c-name {
+            color: #666;
+            text-decoration: line-through;
+        }
+
+        .c-meta {
+            font-size: 9px;
+            font-weight: 900;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Premium Card */
+        .premium-card {
+            margin: 50px 24px;
+            padding: 44px 32px;
+            background: linear-gradient(135deg, #111, #000);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 44px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .premium-card h3 {
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin-bottom: 14px;
+            letter-spacing: -0.02em;
+        }
+
+        .premium-card p {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 36px;
+        }
+
+        .cta-btn {
+            display: block;
+            width: 100%;
+            padding: 24px;
+            background: var(--accent);
+            color: black;
+            border-radius: 24px;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.2);
+        }
+
+        /* Settings List */
+        .settings-sec {
+            margin-bottom: 50px;
+        }
+
+        .setting-item {
+            margin: 0 24px 10px 24px;
+            padding: 24px 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #555;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .setting-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .s-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .s-left span {
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="player.html" class="back-btn"><i data-lucide="chevron-left"></i></a>
+        <span class="nav-title">Santuario</span>
+        <div style="width: 44px;"></div>
+    </nav>
+
+    <div class="header">
+        <div class="avatar-wrap">
+            <div class="avatar">GC</div>
+            <div class="level-badge" id="lvl-badge">Cargando...</div>
+        </div>
+        <h2 class="name">Gerardo C.</h2>
+
+        <div class="xp-bar-container">
+            <div class="xp-bar-fill" id="xp-fill"></div>
+        </div>
+        <div class="xp-info">
+            <span id="xp-text">0 XP</span>
+            <span id="next-lvl-text">Próximo Nivel</span>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <span class="stat-val" id="stat-days">5</span>
+            <span class="stat-label">Días</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-val" id="stat-minutes">120</span>
+            <span class="stat-label">Minutos</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-val" id="stat-sessions">12</span>
+            <span class="stat-label">Rituales</span>
+        </div>
+    </div>
+
+    <div class="section-title">Retos Diarios</div>
+
+    <div class="challenge-card done">
+        <div class="c-icon"><i data-lucide="check-circle-2"></i></div>
+        <div class="c-body">
+            <p class="c-name">Despertar Consciente</p>
+            <span class="c-meta">Completado +50 XP</span>
+        </div>
+    </div>
+
+    <div class="challenge-card" id="challenge-2">
+        <div class="c-icon"><i data-lucide="moon"></i></div>
+        <div class="c-body">
+            <p class="c-name">Ritual de Sueño de 10 min</p>
+            <span class="c-meta">+100 XP Disponibles</span>
+        </div>
+    </div>
+
+    <div class="premium-card">
+        <h3>Membresía Santuario</h3>
+        <p>Desbloquea todos los retos, loops infinitos y sonidos binaurales exclusivos.</p>
+        <a href="#" class="cta-btn">Pasar a Pro • 3,99€</a>
+    </div>
+
+    <div class="section-title">Ajustes</div>
+    <div class="settings-sec">
+        <div class="setting-item">
+            <div class="s-left"><i data-lucide="heart" size="20"></i><span>Favoritos</span></div>
+            <i data-lucide="chevron-right" size="18"></i>
+        </div>
+        <div class="setting-item">
+            <div class="s-left"><i data-lucide="shield-check" size="20"></i><span>Privacidad y Datos</span></div>
+            <i data-lucide="chevron-right" size="18"></i>
+        </div>
+        <div class="setting-item">
+            <div class="s-left"><i data-lucide="bell" size="20"></i><span>Recordatorios</span></div>
+            <i data-lucide="chevron-right" size="18"></i>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 60px 0 100px 0;">
+        <button onclick="clearData()"
+            style="border: none; background: none; color: #333; font-weight: 900; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5em; cursor: pointer;">Cerrar
+            Sesión / Reset</button>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function loadProfile() {
+            const xp = parseInt(localStorage.getItem('calmly_xp')) || 1420;
+            document.getElementById('xp-text').innerText = `${xp.toLocaleString()} XP`;
+
+            let lvl = "Novato";
+            let nextLvlXp = 500;
+            let prevLvlXp = 0;
+
+            if (xp >= 500) { lvl = "Iniciado"; prevLvlXp = 500; nextLvlXp = 1500; }
+            if (xp >= 1500) { lvl = "Ritualista"; prevLvlXp = 1500; nextLvlXp = 3000; }
+            if (xp >= 3000) { lvl = "Maestro Zen"; prevLvlXp = 3000; nextLvlXp = 8000; }
+            if (xp >= 8000) { lvl = "Leyenda"; prevLvlXp = 8000; nextLvlXp = 20000; }
+
+            document.getElementById('lvl-badge').innerText = lvl;
+
+            // Progress Bar Logic
+            const progress = ((xp - prevLvlXp) / (nextLvlXp - prevLvlXp)) * 100;
+            setTimeout(() => {
+                document.getElementById('xp-fill').style.width = `${Math.min(100, Math.max(5, progress))}%`;
+            }, 100);
+
+            // Mocking stats based on XP
+            document.getElementById('stat-minutes').innerText = Math.round(xp / 12);
+            document.getElementById('stat-sessions').innerText = Math.round(xp / 120);
+        }
+
+        function clearData() {
+            if (confirm("¿Seguro que quieres borrar tus datos?")) {
+                localStorage.removeItem('calmly_xp');
+                location.reload();
+            }
+        }
+
+        loadProfile();
+    </script>
+</body>
+
+</html>

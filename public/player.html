@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calmly Player | Ritual Premium</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@100;300;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-primary: #ffffff;
+            --text-secondary: #666666;
+            --accent: #d4af37;
+            --accent-soft: rgba(212, 175, 55, 0.1);
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body,
+        html {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hypnotic Background */
+        .visualizer {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease;
+        }
+
+        .aura {
+            width: 150vw;
+            height: 150vw;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: breathe 10s infinite ease-in-out;
+            opacity: 0.4;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.6;
+            }
+        }
+
+        /* Nav */
+        nav {
+            position: relative;
+            z-index: 100;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+            transition: transform 0.6s ease, opacity 0.6s ease;
+        }
+
+        .nav-btn {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            color: white;
+            border-color: white;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .xp-top {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lvl-name {
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+
+        .xp-count {
+            font-size: 14px;
+            font-weight: 200;
+            color: #888;
+        }
+
+        /* Main Player Container */
+        .main-stage {
+            flex: 1;
+            position: relative;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 40px;
+        }
+
+        .mode-indicator {
+            padding: 10px 20px;
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 100px;
+            color: var(--accent);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease;
+        }
+
+        .timer-display {
+            font-family: var(--font-display);
+            font-size: 7rem;
+            font-weight: 100;
+            letter-spacing: -0.05em;
+            color: white;
+            line-height: 1;
+            margin-bottom: 12px;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+        }
+
+        .track-info {
+            font-size: 12px;
+            font-weight: 400;
+            color: #555;
+            letter-spacing: 0.05em;
+            height: 20px;
+        }
+
+        /* Big Play Interaction */
+        .play-trigger {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .play-trigger:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .play-trigger:active {
+            transform: scale(0.95);
+        }
+
+        .pulse-core {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 20px white;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+
+            50% {
+                transform: scale(1.4);
+                opacity: 1;
+            }
+        }
+
+        /* Controls Block */
+        .controls-panel {
+            position: relative;
+            z-index: 100;
+            margin: 0 24px 40px 24px;
+            padding: 32px;
+            background: rgba(10, 10, 10, 0.5);
+            backdrop-filter: blur(40px) saturate(1.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 44px;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:active {
+            transform: scale(0.9);
+        }
+
+        .icn-box {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            transition: all 0.3s;
+        }
+
+        .action-btn.active .icn-box {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .action-btn:hover .icn-box {
+            color: white;
+        }
+
+        .btn-lbl {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #444;
+        }
+
+        .vol-slider-container {
+            flex: 1;
+            padding: 0 32px;
+        }
+
+        .vol-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 8px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #333;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Mode Switcher (Matching Image) */
+        .mode-list {
+            display: flex;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 8px;
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 10px;
+        }
+
+        .m-button {
+            flex: 1;
+            padding: 22px 0;
+            background: none;
+            border: none;
+            color: #444;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .m-button.selected {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            transform: scale(1.02);
+        }
+
+        /* Success View */
+        .done-view {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: zoomFade 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .done-view.show {
+            display: flex;
+        }
+
+        @keyframes zoomFade {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .save-btn {
+            margin-top: 40px;
+            padding: 22px 60px;
+            background: white;
+            color: black;
+            border-radius: 28px;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* UI Toggle System */
+        .ui-hidden nav {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .ui-hidden .controls-panel {
+            transform: translateY(150%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* OLED overlay */
+        #oled-overlay {
+            position: fixed;
+            inset: 0;
+            background: black;
+            z-index: 9999;
+            display: none;
+            cursor: pointer;
+        }
+
+        /* Notification */
+        .toast {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: white;
+            color: black;
+            padding: 14px 28px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            z-index: 10000;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .toast.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Hidden helpers */
+        .invisible {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body id="player-body">
+
+    <div id="toast" class="toast">
+        <i data-lucide="sparkles" size="18" style="color: #d4af37"></i>
+        <span id="toast-msg">¡Ritual Guardado! +80 XP</span>
+    </div>
+
+    <!-- OLED Mode -->
+    <div id="oled-overlay"></div>
+
+    <div class="visualizer" id="viz">
+        <div class="aura" id="aura"></div>
+    </div>
+
+    <nav id="navbar">
+        <a href="index.html" class="nav-btn"><i data-lucide="x"></i></a>
+        <div class="xp-top">
+            <span class="lvl-name" id="user-level">Maestro Zen</span>
+            <span class="xp-count" id="user-xp">1,420 XP</span>
+        </div>
+        <a href="profile.html" class="nav-btn">
+            <span style="font-size: 10px; font-weight: 900; color: white;">GC</span>
+        </a>
+    </nav>
+
+    <div class="main-stage">
+        <!-- Default State -->
+        <div id="idle-ui" class="state-view">
+            <div class="mode-indicator" id="current-mode-lbl">Modo Relajar</div>
+            <div class="timer-display" style="opacity: 0.1">20:00</div>
+            <div class="play-trigger" id="master-start">
+                <div class="pulse-core"></div>
+            </div>
+            <p
+                style="margin-top: 100px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4em; color: #333;">
+                Toca para conectar</p>
+        </div>
+
+        <!-- Playing State -->
+        <div id="playing-ui" class="state-view hidden">
+            <div id="digital-clock-view">
+                <div class="timer-display" id="clock">20:00</div>
+                <div class="track-info" id="track-name">Cargando Ritual...</div>
+            </div>
+
+            <!-- Ritual Engine (Powered by YT, masked for Premium Look) -->
+            <div id="ritual-engine-container"
+                style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden;">
+                <div id="yt-player"></div>
+            </div>
+
+            <div id="manual-controls" style="display: flex; gap: 30px; margin-top: 40px;">
+                <button onclick="toggleRitual()" class="action-btn" style="opacity: 1;">
+                    <div class="icn-box" id="play-pause-icn"
+                        style="width: 72px; height: 72px; border-radius: 24px; border-color: rgba(255,255,255,0.2); color: white;">
+                        <i data-lucide="pause" fill="white"></i>
+                    </div>
+                </button>
+                <button onclick="nextRitual()" class="action-btn" style="opacity: 1;">
+                    <div class="icn-box" style="width: 72px; height: 72px; border-radius: 24px;">
+                        <i data-lucide="skip-forward"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Done State -->
+        <div id="done-ui" class="done-view">
+            <div style="margin-bottom: 30px;">
+                <i data-lucide="sparkles" size="80" style="color: var(--accent); opacity: 0.8;"></i>
+            </div>
+            <h2 style="font-size: 3rem; font-weight: 100; letter-spacing: -0.05em;">Calma Profunda</h2>
+            <p id="xp-result"
+                style="color: var(--accent); font-weight: 800; text-transform: uppercase; font-size: 12px; margin-top: 20px; letter-spacing: 0.3em;">
+                +80 XP Conseguidos</p>
+            <a href="check-in.html" class="save-btn" onclick="applyXP()">Guardar Ritual</a>
+            <button onclick="resetApp()"
+                style="margin-top: 40px; background: none; border: none; color: #333; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.4em; cursor: pointer;">Volver</button>
+        </div>
+    </div>
+
+    <!-- Interface Panel -->
+    <div class="controls-panel" id="controls">
+        <div class="top-row">
+            <button class="action-btn" id="oled-btn" onclick="toggleOLED()">
+                <div class="icn-box"><i data-lucide="moon" size="22"></i></div>
+                <span class="btn-lbl">OLED</span>
+            </button>
+
+            <div class="vol-slider-container">
+                <div class="vol-header">
+                    <span>Volumen Ritual</span>
+                    <i data-lucide="volume-2" size="12"></i>
+                </div>
+                <input type="range" id="vol-range" min="0" max="1" step="0.01" value="0.6">
+            </div>
+
+            <button class="action-btn" id="timer-cycle-btn" onclick="cycleTime()">
+                <div class="icn-box" style="border-color: rgba(212, 175, 55, 0.3); color: var(--accent);">
+                    <i data-lucide="timer" size="22"></i>
+                </div>
+                <span class="btn-lbl" id="timer-lbl">20 min</span>
+            </button>
+        </div>
+
+        <div class="mode-list">
+            <button class="m-button" onclick="changeMode('Dormir', this)">Dormir</button>
+            <button class="m-button selected" onclick="changeMode('Relajar', this)">Relajar</button>
+            <button class="m-button" onclick="changeMode('Enfoque', this)">Enfoque</button>
+        </div>
+    </div>
+
+    <!-- Hidden Audio System -->
+    <audio id="audio-engine" loop></audio>
+
+    <!-- YouTube API Engine -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        lucide.createIcons();
+
+        // --- Expanded Configuration: 10h+ Infinite Rituals ---
+        const ritualPlaylists = {
+            'Relajar': [
+                { id: '1u77vAt32yY', name: 'Zen Profundo Infinito (10h)' },
+                { id: 'fE0Xv_87mXo', name: 'Paz Interior & Cuencos (12h)' },
+                { id: 'lFzVJEkscDY', name: 'Meditación Trascendental (8h)' },
+                { id: '77ZozI0rw7w', name: 'Frecuencia de Sanación 432Hz (9h)' },
+                { id: '2OEL4P1Rz04', name: 'Jardín Japonés Relax (10h)' }
+            ],
+            'Dormir': [
+                { id: 'n_L78_1H-P8', name: 'Lluvia en Ventana (10h)' },
+                { id: 'nMfPqeZjc2c', name: 'Noche en la Jungla (10h)' },
+                { id: '00X4D_2WJ58', name: 'Ruido Blanco Puro (12h)' },
+                { id: 'M0u9X7H__Is', name: 'Tormenta Eléctrica Suave (10h)' },
+                { id: 'w77zPAtV6FE', name: 'Paz Profunda Nocturna (8h)' }
+            ],
+            'Enfoque': [
+                { id: 'WPni755-Krg', name: 'Ondas Alpha de Estudio (10h)' },
+                { id: '5qap5aO4i9A', name: 'Lofi Santuario Radio (24/7)' },
+                { id: 'VpS-o93dF_A', name: 'Deep Focus Brainwaves (8h)' },
+                { id: 'm-X6Z_lU7EY', name: 'Concentración Total (10h)' },
+                { id: 'M5QY2_8704o', name: 'Synthwave para Programar (8h)' }
+            ]
+        };
+
+        // --- State Management ---
+        let state = {
+            isPlaying: false,
+            timeLeft: 1200,
+            initialTime: 1200,
+            volume: 60,
+            mode: 'Relajar',
+            trackIndex: 0,
+            xp: parseInt(localStorage.getItem('calmly_xp')) || 1420,
+            uiVisible: true,
+            uiTimeout: null,
+            apiReady: false
+        };
+
+        let player;
+        const clock = document.getElementById('clock');
+        const trackLbl = document.getElementById('track-name');
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                height: '1',
+                width: '100',
+                videoId: ritualPlaylists[state.mode][0].id,
+                playerVars: {
+                    'controls': 0,
+                    'disablekb': 1,
+                    'modestbranding': 1,
+                    'rel': 0,
+                    'loop': 1,
+                    'autoplay': 0
+                },
+                events: {
+                    'onReady': () => {
+                        state.apiReady = true;
+                        console.log("Portal de Ritual Listo");
+                    },
+                    'onStateChange': (e) => {
+                        // Handle potential stops or errors
+                        if (e.data === YT.PlayerState.ENDED) {
+                            nextRitual();
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Core Functions ---
+
+        function init() {
+            updateXPDisplay();
+
+            document.body.addEventListener('click', () => {
+                if (!state.isPlaying) return;
+                showUI();
+            });
+
+            document.getElementById('master-start').addEventListener('click', startRitual);
+        }
+
+        function updateXPDisplay() {
+            const xp = state.xp;
+            document.getElementById('user-xp').innerText = `${xp.toLocaleString()} XP`;
+            let lvl = "Novato";
+            if (xp > 500) lvl = "Iniciado";
+            if (xp > 1500) lvl = "Ritualista";
+            if (xp > 3000) lvl = "Maestro Zen";
+            if (xp > 8000) lvl = "Leyenda";
+            document.getElementById('user-level').innerText = lvl;
+        }
+
+        function changeMode(m, el) {
+            if (state.mode === m && !el) return;
+            state.mode = m;
+            state.trackIndex = 0;
+
+            // UI Update: Toggle 'selected' class
+            document.querySelectorAll('.m-button').forEach(b => b.classList.remove('selected'));
+            if (el) {
+                el.classList.add('selected');
+            } else {
+                // Fallback for initial load or programmatic calls
+                const btn = Array.from(document.querySelectorAll('.m-button')).find(b => b.innerText.includes(m));
+                if (btn) btn.classList.add('selected');
+            }
+
+            document.getElementById('current-mode-lbl').innerText = `Modo ${m}`;
+
+            const aura = document.getElementById('aura');
+            if (m === 'Dormir') aura.style.background = 'radial-gradient(circle, rgba(147, 112, 219, 0.15) 0%, transparent 70%)';
+            if (m === 'Relajar') aura.style.background = 'radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%)';
+            if (m === 'Enfoque') aura.style.background = 'radial-gradient(circle, rgba(70, 130, 180, 0.15) 0%, transparent 70%)';
+
+            if (state.isPlaying) {
+                loadRitual();
+            } else {
+                const track = ritualPlaylists[state.mode][state.trackIndex];
+                trackLbl.innerText = track.name;
+            }
+        }
+
+        function loadRitual() {
+            if (!player || !state.apiReady) return;
+            const track = ritualPlaylists[state.mode][state.trackIndex];
+            trackLbl.innerText = track.name;
+            player.loadVideoById(track.id);
+            player.playVideo();
+
+            const icn = document.getElementById('play-pause-icn');
+            icn.innerHTML = '<i data-lucide="pause" fill="white"></i>';
+            lucide.createIcons();
+        }
+
+        function startRitual() {
+            if (!state.apiReady) {
+                trackLbl.innerText = "Conectando al Santuario...";
+                setTimeout(startRitual, 500);
+                return;
+            }
+
+            state.isPlaying = true;
+            document.getElementById('idle-ui').classList.add('hidden');
+            document.getElementById('playing-ui').classList.remove('hidden');
+
+            loadRitual();
+            startTicker();
+            hideUI();
+        }
+
+        function toggleRitual() {
+            if (!player || !state.apiReady) return;
+            const icn = document.getElementById('play-pause-icn');
+            const pState = player.getPlayerState();
+
+            if (pState === YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+                icn.innerHTML = '<i data-lucide="play" fill="white" style="margin-left:4px"></i>';
+            } else {
+                player.playVideo();
+                icn.innerHTML = '<i data-lucide="pause" fill="white"></i>';
+            }
+            lucide.createIcons();
+            showUI();
+        }
+
+        function nextRitual() {
+            state.trackIndex = (state.trackIndex + 1) % ritualPlaylists[state.mode].length;
+            loadRitual();
+            showUI();
+        }
+
+        function startTicker() {
+            if (window.ritualTicker) clearInterval(window.ritualTicker);
+            window.ritualTicker = setInterval(() => {
+                if (!state.isPlaying) {
+                    clearInterval(window.ritualTicker);
+                    return;
+                }
+
+                const pState = (player && state.apiReady) ? player.getPlayerState() : -1;
+                // Count if playing or buffering
+                if (pState === YT.PlayerState.PLAYING || pState === YT.PlayerState.BUFFERING) {
+                    state.timeLeft--;
+                    updateClock();
+                }
+
+                if (state.timeLeft <= 0) {
+                    clearInterval(window.ritualTicker);
+                    finishRitual();
+                }
+            }, 1000);
+        }
+
+        function updateClock() {
+            const m = Math.floor(state.timeLeft / 60);
+            const s = state.timeLeft % 60;
+            clock.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function finishRitual() {
+            state.isPlaying = false;
+            // Removed player.pauseVideo() so music keeps playing for sleep
+
+            const earned = Math.round(state.initialTime / 12);
+            document.getElementById('xp-result').innerText = `+${earned} XP Conseguidos`;
+
+            document.getElementById('playing-ui').classList.add('hidden');
+            document.getElementById('done-ui').classList.add('show');
+            document.getElementById('player-body').classList.remove('ui-hidden');
+
+            state.xp += earned;
+            localStorage.setItem('calmly_xp', state.xp);
+            updateXPDisplay();
+            showToast("Ritual Completado. XP Guardada.");
+        }
+
+        function showUI() {
+            state.uiVisible = true;
+            document.getElementById('player-body').classList.remove('ui-hidden');
+            clearTimeout(state.uiTimeout);
+            if (state.isPlaying) {
+                state.uiTimeout = setTimeout(hideUI, 5000);
+            }
+        }
+
+        function hideUI() {
+            const pState = (player && state.apiReady) ? player.getPlayerState() : -1;
+            if (!state.isPlaying || pState !== YT.PlayerState.PLAYING) return;
+            state.uiVisible = false;
+            document.getElementById('player-body').classList.add('ui-hidden');
+        }
+
+        function toggleOLED() {
+            const overlay = document.getElementById('oled-overlay');
+            overlay.style.display = 'block';
+            overlay.onclick = () => overlay.style.display = 'none';
+        }
+
+        function cycleTime() {
+            const lbl = document.getElementById('timer-lbl');
+            let mins = parseInt(lbl.innerText);
+            if (mins === 20) mins = 40;
+            else if (mins === 40) mins = 10;
+            else mins = 20;
+            lbl.innerText = `${mins} min`;
+            state.timeLeft = mins * 60;
+            state.initialTime = state.timeLeft;
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (!t) return;
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.add('active');
+            setTimeout(() => t.classList.remove('active'), 3000);
+        }
+
+        document.getElementById('vol-range').addEventListener('input', (e) => {
+            state.volume = e.target.value * 100;
+            if (player && state.apiReady) player.setVolume(state.volume);
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
