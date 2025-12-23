@@ -5,32 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Volume2, Moon, Timer, X, CheckCircle2, Play, Pause, SkipForward, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { useApp } from '@/context/AppContext'
-
-// Define types for strictly indexed objects
-type Mode = 'Dormir' | 'Relajar' | 'Enfoque'
-
-interface Track {
-    id: string
-    name: string
-}
-
-const RITUAL_PLAYLISTS: Record<Mode, Track[]> = {
-    'Relajar': [
-        { id: '1u77vAt32yY', name: 'Zen Profundo Infinito (10h)' },
-        { id: 'fE0Xv_87mXo', name: 'Paz Interior & Cuencos (12h)' },
-        { id: 'lFzVJEkscDY', name: 'Meditación Trascendental (8h)' },
-    ],
-    'Dormir': [
-        { id: 'n_L78_1H-P8', name: 'Lluvia en Ventana (10h)' },
-        { id: 'nMfPqeZjc2c', name: 'Noche en la Jungla (10h)' },
-        { id: '00X4D_2WJ58', name: 'Ruido Blanco Puro (12h)' },
-    ],
-    'Enfoque': [
-        { id: 'WPni755-Krg', name: 'Ondas Alpha para Estudiar (10h)' },
-        { id: '5qap5aO4i9A', name: 'Lofi Santuario Radio (24/7)' },
-        { id: 'VpS-o93dF_A', name: 'Deep Focus Brainwaves (8h)' },
-    ]
-}
+import { RITUAL_DATA, RitualMode, RitualTrack } from '@/data/rituals'
 
 declare global {
     interface Window {
@@ -41,7 +16,8 @@ declare global {
 
 export default function PlayerPage() {
     const { addSession, level, xp } = useApp()
-    const [mode, setMode] = useState<Mode>('Relajar')
+    const [mode, setMode] = useState<RitualMode>('Relajar')
+    const [playlist, setPlaylist] = useState<RitualTrack[]>([])
     const [isScreenOff, setIsScreenOff] = useState(false)
     const [showControls, setShowControls] = useState(true)
     const [timeLeft, setTimeLeft] = useState<number | null>(null)
@@ -55,6 +31,18 @@ export default function PlayerPage() {
     const playerRef = useRef<any>(null)
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+    // Shuffle playlist on mode change or mount
+    useEffect(() => {
+        const tracks = [...RITUAL_DATA[mode]]
+        // Fisher-Yates shuffle
+        for (let i = tracks.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [tracks[i], tracks[j]] = [tracks[j], tracks[i]];
+        }
+        setPlaylist(tracks)
+        setTrackIndex(0)
+    }, [mode])
+
     // Load YouTube API
     useEffect(() => {
         const loadYT = () => {
@@ -65,35 +53,44 @@ export default function PlayerPage() {
                 firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
 
                 window.onYouTubeIframeAPIReady = () => {
-                    initPlayer(RITUAL_PLAYLISTS[mode][trackIndex].id);
+                    setApiReady(true)
                 };
             } else if (window.YT.Player) {
-                initPlayer(RITUAL_PLAYLISTS[mode][trackIndex].id);
+                setApiReady(true)
             }
         };
-
         loadYT();
-
         return () => {
             if (timeoutRef.current) clearTimeout(timeoutRef.current)
         }
     }, [])
 
-    const initPlayer = (videoId: string) => {
-        if (playerRef.current) return;
-        playerRef.current = new window.YT.Player('yt-player', {
-            height: '1',
-            width: '1',
-            videoId: videoId,
-            playerVars: { 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'rel': 0, 'loop': 1 },
-            events: {
-                'onReady': () => setApiReady(true),
-                'onStateChange': (e: { data: number }) => {
-                    if (e.data === window.YT.PlayerState.ENDED) nextRitual()
+    // Initialize player once API is ready and playlist is set
+    useEffect(() => {
+        if (apiReady && playlist.length > 0 && !playerRef.current) {
+            playerRef.current = new window.YT.Player('yt-player', {
+                height: '1',
+                width: '1',
+                videoId: playlist[0].id,
+                playerVars: { 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'rel': 0, 'loop': 1 },
+                events: {
+                    'onStateChange': (e: { data: number }) => {
+                        if (e.data === window.YT.PlayerState.ENDED) nextRitual()
+                    }
                 }
-            }
-        });
-    }
+            });
+        } else if (apiReady && playlist.length > 0 && playerRef.current && isPlaying) {
+            // If we changed mode, playlist changed. If we are supposed to be playing, load the new first track?
+            // Actually, better to wait for user to hit play unless it was already playing?
+            // Let's just load the first track of the shuffle but NOT auto-play to avoid jarring transitions
+            // UNLESS the user was already jamming. But mode change stops playback usually.
+            // We'll let user press play.
+            playerRef.current.loadVideoById(playlist[0].id)
+            playerRef.current.stopVideo()
+            setIsPlaying(false)
+            setTimeLeft(initialTime)
+        }
+    }, [apiReady, playlist]) // Be careful with this dependency 
 
     const resetControlsTimeout = () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
@@ -125,10 +122,8 @@ export default function PlayerPage() {
         return () => clearInterval(timer)
     }, [timeLeft, isFinished, isPlaying, apiReady])
 
-    const loadRitual = (m: Mode, idx: number) => {
-        if (!playerRef.current || !apiReady) return
-        const playlist = RITUAL_PLAYLISTS[m];
-        if (!playlist || !playlist[idx]) return;
+    const loadRitual = (idx: number) => {
+        if (!playerRef.current || !apiReady || !playlist[idx]) return
 
         const track = playlist[idx];
         playerRef.current.loadVideoById(track.id)
@@ -140,7 +135,7 @@ export default function PlayerPage() {
         setIsFinished(false)
         setTimeLeft(initialTime)
         setIsPlaying(true)
-        loadRitual(mode, trackIndex)
+        loadRitual(trackIndex)
         resetControlsTimeout()
     }
 
@@ -158,18 +153,18 @@ export default function PlayerPage() {
     }
 
     const nextRitual = () => {
-        const nextIdx = (trackIndex + 1) % RITUAL_PLAYLISTS[mode].length
+        if (playlist.length === 0) return
+        const nextIdx = (trackIndex + 1) % playlist.length
         setTrackIndex(nextIdx)
-        loadRitual(mode, nextIdx)
+        loadRitual(nextIdx)
         setShowControls(true)
     }
 
-    const changeMode = (m: Mode) => {
+    const changeMode = (m: RitualMode) => {
+        if (m === mode) return
         setMode(m)
-        setTrackIndex(0)
-        if (isPlaying) {
-            loadRitual(m, 0)
-        }
+        // Playlist shuffle happens in useEffect
+        // Player update happens in useEffect
     }
 
     const handleFinish = () => {
@@ -189,6 +184,8 @@ export default function PlayerPage() {
         if (mode === 'Relajar') return 'rgba(212, 175, 55, 0.15)'
         return 'rgba(70, 130, 180, 0.15)'
     }
+
+    const currentTrackName = playlist[trackIndex]?.name || 'Cargando Ritual...'
 
     return (
         <main className="relative h-screen w-screen bg-black overflow-hidden flex flex-col select-none"
@@ -247,7 +244,7 @@ export default function PlayerPage() {
                 </Link>
                 <div className="flex flex-col items-center">
                     <span className="text-[9px] tracking-[0.4em] uppercase text-accent font-black mb-1">{level} • {xp} XP</span>
-                    <span className="text-xs font-medium text-gray-400">{RITUAL_PLAYLISTS[mode][trackIndex].name}</span>
+                    <span className="text-xs font-medium text-gray-400">{currentTrackName}</span>
                 </div>
                 <Link href="/profile">
                     <div className="w-12 h-12 rounded-2xl border border-white/5 flex items-center justify-center bg-white/5 backdrop-blur-xl overflow-hidden">
@@ -271,7 +268,7 @@ export default function PlayerPage() {
                                 {formatTime(timeLeft)}
                             </div>
                             <div className="track-info text-[10px] font-black uppercase tracking-[0.3em] text-gray-600 mb-10">
-                                {RITUAL_PLAYLISTS[mode][trackIndex].name}
+                                {currentTrackName}
                             </div>
                             <div className="flex items-center gap-8">
                                 <button onClick={toggleRitual} className="w-20 h-20 rounded-[28px] bg-white/5 border border-white/10 flex items-center justify-center text-white transition-transform active:scale-90">
@@ -373,7 +370,7 @@ export default function PlayerPage() {
                         </div>
 
                         <div className="flex justify-between gap-2 p-1 bg-white/5 rounded-[40px] border border-white/5 overflow-hidden">
-                            {(['Dormir', 'Relajar', 'Enfoque'] as Mode[]).map((m) => (
+                            {(['Dormir', 'Relajar', 'Enfoque'] as RitualMode[]).map((m) => (
                                 <button
                                     key={m}
                                     onClick={() => changeMode(m)}
